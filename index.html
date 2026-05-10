@@ -3,371 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🍒 Cherry Survival</title>
+<title>🚗 Endless Drive</title>
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;overflow:hidden;font-family:Arial;background:radial-gradient(circle at top,#fff7fb,#ffdce8 45%,#fff);color:#111}
-#game{width:100vw;height:100vh;position:relative}
-.hud{position:fixed;top:12px;left:12px;right:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;z-index:20}
-.box{background:rgba(255,255,255,.85);backdrop-filter:blur(10px);padding:9px;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,.12);font-weight:900;font-size:14px;text-align:center}
-#player{position:absolute;bottom:35px;left:50%;transform:translateX(-50%);width:105px;height:55px;border-radius:0 0 45px 45px;background:linear-gradient(180deg,#3a2a22,#151515);box-shadow:0 18px 30px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;font-size:34px}
-#player:before{content:"";position:absolute;top:-13px;width:105px;height:25px;border:5px solid #2b201b;border-bottom:0;border-radius:50px 50px 0 0}
-.item,.enemy,.laser{position:absolute}
-.item{font-size:30px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.18))}
-.enemy{font-size:34px}
-.laser{width:6px;height:26px;background:#00e5ff;border-radius:99px;box-shadow:0 0 18px #00e5ff}
-.screen{position:fixed;inset:0;background:linear-gradient(180deg,#fff,#ffe4ee);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99;text-align:center;padding:24px}
+body{margin:0;overflow:hidden;font-family:Arial;background:#111;color:white}
+#game{width:100vw;height:100vh;position:relative;background:linear-gradient(#222,#111)}
+.road{position:absolute;left:50%;top:0;transform:translateX(-50%);width:330px;height:100vh;background:#333;overflow:hidden}
+.line{position:absolute;left:50%;width:10px;height:80px;background:white;border-radius:10px;transform:translateX(-50%)}
+#car{position:absolute;bottom:55px;left:50%;transform:translateX(-50%);font-size:58px;z-index:5}
+.enemy{position:absolute;font-size:52px;z-index:4}
+#hud{position:fixed;top:15px;left:15px;right:15px;display:flex;justify-content:space-between;z-index:10}
+.box{background:rgba(255,255,255,.14);backdrop-filter:blur(8px);padding:12px 16px;border-radius:18px;font-weight:900}
+.screen{position:fixed;inset:0;background:linear-gradient(#111,#333);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:99}
 #gameOver{display:none}
-.logo{font-size:110px;animation:float 2s infinite}
-@keyframes float{50%{transform:translateY(-12px)}}
-h1{font-size:42px;margin:8px 0}
-p{color:#555;font-size:16px;max-width:340px}
-button{border:0;background:linear-gradient(135deg,#ff4d6d,#ff758f);color:white;padding:15px 24px;border-radius:999px;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 14px 28px rgba(255,77,109,.35);margin:6px}
-#controls{position:fixed;bottom:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 24px;z-index:30;pointer-events:none}
-.controlBtn{width:64px;height:64px;border-radius:50%;background:rgba(17,17,17,.82);color:white;font-size:28px;display:flex;align-items:center;justify-content:center;pointer-events:auto;user-select:none;box-shadow:0 12px 24px rgba(0,0,0,.25)}
-#shootBtn{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);z-index:30;background:#111;color:white;width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 12px 24px rgba(0,0,0,.25)}
-#shop{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;z-index:120;padding:22px;overflow:auto}
-.shop-card{background:white;border-radius:28px;padding:20px;max-width:430px;margin:auto;text-align:center}
-.upgrade{display:flex;justify-content:space-between;align-items:center;background:#f4f4f4;border-radius:18px;padding:12px;margin:10px 0;text-align:right}
-.buy{background:#111;color:white;padding:10px 14px;border-radius:14px;font-size:14px}
-.catchPop{position:absolute;font-size:24px;pointer-events:none;animation:popUp .5s ease forwards}
-@keyframes popUp{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-35px) scale(1.4)}}
+h1{font-size:44px;margin:8px}
+p{color:#ddd}
+button{border:0;background:#ff4d6d;color:white;padding:16px 28px;border-radius:999px;font-size:18px;font-weight:900}
+.controls{position:fixed;bottom:20px;left:0;right:0;display:flex;justify-content:space-between;padding:0 30px;z-index:20;pointer-events:none}
+.ctrl{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:32px;pointer-events:auto}
 </style>
 </head>
 
 <body>
 
 <div id="game">
-  <div class="hud">
-    <div class="box">🍒 ניקוד: <span id="score">0</span></div>
-    <div class="box">🪙 מטבעות: <span id="coins">0</span></div>
-    <div class="box">❤️ חיים: <span id="lifeCount">3</span></div>
+  <div class="road" id="road"></div>
+  <div id="car">🚗</div>
+
+  <div id="hud">
+    <div class="box">ניקוד: <span id="score">0</span></div>
+    <div class="box">שיא: <span id="best">0</span></div>
   </div>
 
-  <div id="player">🧺</div>
-
-  <div id="controls">
-    <div class="controlBtn" ontouchstart="moveLeft=true" ontouchend="moveLeft=false" onmousedown="moveLeft=true" onmouseup="moveLeft=false">⬅️</div>
-    <div class="controlBtn" ontouchstart="moveRight=true" ontouchend="moveRight=false" onmousedown="moveRight=true" onmouseup="moveRight=false">➡️</div>
+  <div class="controls">
+    <div class="ctrl" ontouchstart="left=true" ontouchend="left=false" onmousedown="left=true" onmouseup="left=false">⬅️</div>
+    <div class="ctrl" ontouchstart="right=true" ontouchend="right=false" onmousedown="right=true" onmouseup="right=false">➡️</div>
   </div>
-
-  <div id="shootBtn" onclick="shootLaser()">🔫</div>
 </div>
 
-<div id="startScreen" class="screen">
-  <div class="logo">🍒</div>
-  <h1>Cherry Survival</h1>
-  <p>תפוס דובדבנים, אסוף מטבעות, קנה שדרוגים ותירה במפלצות.</p>
-  <button onclick="startGame()">התחל משחק</button>
-  <button onclick="openShop()">🛒 חנות</button>
+<div id="start" class="screen">
+  <div style="font-size:100px">🚗</div>
+  <h1>Endless Drive</h1>
+  <p>תתחמק מהמכוניות ותשבור שיא</p>
+  <button onclick="startGame()">התחל</button>
 </div>
 
 <div id="gameOver" class="screen">
-  <div class="logo">💔</div>
-  <h1>המשחק נגמר</h1>
-  <p>הניקוד שלך: <b id="finalScore">0</b></p>
+  <div style="font-size:100px">💥</div>
+  <h1>נפגעת!</h1>
+  <p>הניקוד שלך: <span id="finalScore">0</span></p>
   <button onclick="restartGame()">שחק שוב</button>
-  <button onclick="openShop()">🛒 חנות שדרוגים</button>
-</div>
-
-<div id="shop">
-  <div class="shop-card">
-    <h1>🛒 חנות</h1>
-    <p>יש לך <b id="shopCoins">0</b> מטבעות 🍒</p>
-
-    <div class="upgrade">
-      <div>⚡ מהירות<br><small>מחיר: 25</small></div>
-      <button class="buy" onclick="buyUpgrade('speed',25)">קנה</button>
-    </div>
-
-    <div class="upgrade">
-      <div>❤️ עוד חיים<br><small>מחיר: 40</small></div>
-      <button class="buy" onclick="buyUpgrade('life',40)">קנה</button>
-    </div>
-
-    <div class="upgrade">
-      <div>🔫 לייזר<br><small>מחיר: 80</small></div>
-      <button class="buy" onclick="buyUpgrade('laser',80)">קנה</button>
-    </div>
-
-    <div class="upgrade">
-      <div>🧺 סל רחב<br><small>מחיר: 100</small></div>
-      <button class="buy" onclick="buyUpgrade('wide',100)">קנה</button>
-    </div>
-
-    <button onclick="closeShop()">סגור</button>
-  </div>
 </div>
 
 <script>
-let score=0;
-let lives=3;
-let coins=Number(localStorage.getItem("coins")) || 0;
-
-let upgrades=JSON.parse(localStorage.getItem("upgrades")) || {
-  speed:0,
-  life:0,
-  laser:false,
-  wide:false
-};
-
-let playerX=window.innerWidth/2;
-let moveLeft=false;
-let moveRight=false;
-let gameRunning=false;
-
-let itemInterval;
-let enemyInterval;
-let fallSpeed=1.6;
-let playerSpeed=5;
-
-const player=document.getElementById("player");
+const road=document.getElementById("road");
+const car=document.getElementById("car");
 const scoreEl=document.getElementById("score");
-const coinsEl=document.getElementById("coins");
-const livesEl=document.getElementById("lifeCount");
+const bestEl=document.getElementById("best");
 
-updateUI();
+let carX=window.innerWidth/2;
+let left=false,right=false;
+let score=0;
+let best=localStorage.getItem("driveBest")||0;
+let speed=4;
+let running=false;
+let enemyTimer;
+
+bestEl.innerText=best;
+
+for(let i=0;i<8;i++){
+  const line=document.createElement("div");
+  line.className="line";
+  line.style.top=(i*140)+"px";
+  road.appendChild(line);
+}
 
 function startGame(){
-  document.getElementById("startScreen").style.display="none";
-  resetGame();
-  gameRunning=true;
-  itemInterval=setInterval(createItem,1100);
-  enemyInterval=setInterval(createEnemy,2600);
-  requestAnimationFrame(gameLoop);
+  document.getElementById("start").style.display="none";
+  reset();
+  running=true;
+  enemyTimer=setInterval(createEnemy,950);
+  requestAnimationFrame(loop);
 }
 
 function restartGame(){
-  clearAllObjects();
+  document.querySelectorAll(".enemy").forEach(e=>e.remove());
   document.getElementById("gameOver").style.display="none";
-  resetGame();
-  gameRunning=true;
-  itemInterval=setInterval(createItem,1100);
-  enemyInterval=setInterval(createEnemy,2600);
-  requestAnimationFrame(gameLoop);
+  reset();
+  running=true;
+  enemyTimer=setInterval(createEnemy,950);
+  requestAnimationFrame(loop);
 }
 
-function resetGame(){
+function reset(){
+  carX=window.innerWidth/2;
   score=0;
-  lives=3+upgrades.life;
-  fallSpeed=1.6;
-  playerSpeed=5+(upgrades.speed*1.2);
-  playerX=window.innerWidth/2;
-
-  if(upgrades.wide){
-    player.style.width="130px";
-  }else{
-    player.style.width="105px";
-  }
-
-  updateUI();
-}
-
-function updateUI(){
+  speed=4;
   scoreEl.innerText=score;
-  coinsEl.innerText=coins;
-  livesEl.innerText=lives;
-  document.getElementById("shopCoins").innerText=coins;
-}
-
-function createItem(){
-  if(!gameRunning)return;
-
-  const item=document.createElement("div");
-  item.className="item";
-
-  const gold=Math.random()<0.12;
-  item.innerText=gold?"🟡":"🍒";
-  item.dataset.type=gold?"gold":"cherry";
-
-  item.style.left=40+Math.random()*(window.innerWidth-80)+"px";
-  item.style.top="-50px";
-
-  document.getElementById("game").appendChild(item);
 }
 
 function createEnemy(){
-  if(!gameRunning || score<8)return;
-
+  if(!running)return;
   const enemy=document.createElement("div");
   enemy.className="enemy";
-  enemy.innerText="👾";
-  enemy.style.left=40+Math.random()*(window.innerWidth-80)+"px";
-  enemy.style.top="-50px";
-
+  enemy.innerText=["🚙","🚕","🚓"][Math.floor(Math.random()*3)];
+  const roadLeft=(window.innerWidth-330)/2;
+  enemy.style.left=(roadLeft+35+Math.random()*240)+"px";
+  enemy.style.top="-70px";
   document.getElementById("game").appendChild(enemy);
 }
 
-function shootLaser(){
-  if(!gameRunning || !upgrades.laser)return;
+function loop(){
+  if(!running)return;
 
-  const laser=document.createElement("div");
-  laser.className="laser";
-  laser.style.left=playerX+"px";
-  laser.style.top=(window.innerHeight-120)+"px";
-  document.getElementById("game").appendChild(laser);
-}
+  if(left)carX-=6;
+  if(right)carX+=6;
 
-function catchEffect(x,y,text){
-  const pop=document.createElement("div");
-  pop.className="catchPop";
-  pop.innerText=text;
-  pop.style.left=x+"px";
-  pop.style.top=y+"px";
-  document.getElementById("game").appendChild(pop);
-  setTimeout(()=>pop.remove(),500);
-}
+  const roadLeft=(window.innerWidth-330)/2;
+  const roadRight=roadLeft+330;
 
-function gameLoop(){
-  if(!gameRunning)return;
+  if(carX<roadLeft+35)carX=roadLeft+35;
+  if(carX>roadRight-35)carX=roadRight-35;
 
-  if(moveLeft)playerX-=playerSpeed;
-  if(moveRight)playerX+=playerSpeed;
+  car.style.left=carX+"px";
 
-  let limit=upgrades.wide?65:52;
-  if(playerX<limit)playerX=limit;
-  if(playerX>window.innerWidth-limit)playerX=window.innerWidth-limit;
-
-  player.style.left=playerX+"px";
-
-  moveItems();
-  moveEnemies();
-  moveLasers();
-
-  requestAnimationFrame(gameLoop);
-}
-
-function moveItems(){
-  document.querySelectorAll(".item").forEach(item=>{
-    let y=item.offsetTop+fallSpeed;
-    item.style.top=y+"px";
-
-    const a=item.getBoundingClientRect();
-    const b=player.getBoundingClientRect();
-
-    if(a.bottom>=b.top && a.left<b.right && a.right>b.left){
-      const gold=item.dataset.type==="gold";
-      item.remove();
-
-      score+=gold?5:1;
-      coins+=gold?5:1;
-
-      catchEffect(a.left,a.top,gold?"+5 🟡":"+1 🍒");
-
-      if(score%15===0)fallSpeed+=0.25;
-
-      localStorage.setItem("coins",coins);
-      updateUI();
-    }
-
-    if(y>window.innerHeight){
-      item.remove();
-      lives--;
-      updateUI();
-      if(lives<=0)endGame();
-    }
+  document.querySelectorAll(".line").forEach(line=>{
+    let y=line.offsetTop+speed;
+    if(y>window.innerHeight)y=-100;
+    line.style.top=y+"px";
   });
-}
 
-function moveEnemies(){
   document.querySelectorAll(".enemy").forEach(enemy=>{
-    let y=enemy.offsetTop+(fallSpeed+0.5);
+    let y=enemy.offsetTop+speed;
     enemy.style.top=y+"px";
 
     const a=enemy.getBoundingClientRect();
-    const b=player.getBoundingClientRect();
+    const b=car.getBoundingClientRect();
 
-    if(a.bottom>=b.top && a.left<b.right && a.right>b.left){
-      enemy.remove();
-      lives--;
-      updateUI();
-      if(lives<=0)endGame();
+    if(a.bottom>b.top && a.top<b.bottom && a.left<b.right && a.right>b.left){
+      endGame();
     }
 
     if(y>window.innerHeight){
       enemy.remove();
+      score++;
+      scoreEl.innerText=score;
+
+      if(score>best){
+        best=score;
+        localStorage.setItem("driveBest",best);
+        bestEl.innerText=best;
+      }
+
+      if(score%8===0)speed+=0.5;
     }
   });
-}
 
-function moveLasers(){
-  document.querySelectorAll(".laser").forEach(laser=>{
-    let y=laser.offsetTop-9;
-    laser.style.top=y+"px";
-
-    const l=laser.getBoundingClientRect();
-
-    document.querySelectorAll(".enemy").forEach(enemy=>{
-      const e=enemy.getBoundingClientRect();
-
-      if(l.top<e.bottom && l.bottom>e.top && l.left<e.right && l.right>e.left){
-        laser.remove();
-        enemy.remove();
-        score+=3;
-        coins+=2;
-        catchEffect(e.left,e.top,"+3 👾");
-        localStorage.setItem("coins",coins);
-        updateUI();
-      }
-    });
-
-    if(y<0)laser.remove();
-  });
+  requestAnimationFrame(loop);
 }
 
 function endGame(){
-  gameRunning=false;
-  clearInterval(itemInterval);
-  clearInterval(enemyInterval);
+  running=false;
+  clearInterval(enemyTimer);
   document.getElementById("finalScore").innerText=score;
   document.getElementById("gameOver").style.display="flex";
 }
 
-function clearAllObjects(){
-  document.querySelectorAll(".item,.enemy,.laser,.catchPop").forEach(e=>e.remove());
-}
-
-function openShop(){
-  updateUI();
-  document.getElementById("shop").style.display="block";
-}
-
-function closeShop(){
-  document.getElementById("shop").style.display="none";
-}
-
-function buyUpgrade(type,price){
-  if(coins<price){
-    alert("אין מספיק מטבעות 🍒");
-    return;
-  }
-
-  coins-=price;
-
-  if(type==="speed")upgrades.speed++;
-  if(type==="life")upgrades.life++;
-  if(type==="laser")upgrades.laser=true;
-  if(type==="wide")upgrades.wide=true;
-
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("upgrades",JSON.stringify(upgrades));
-
-  updateUI();
-  alert("שדרוג נקנה 😈");
-}
-
 document.addEventListener("keydown",e=>{
-  if(e.key==="ArrowLeft")moveLeft=true;
-  if(e.key==="ArrowRight")moveRight=true;
-  if(e.key===" " || e.key==="Spacebar")shootLaser();
+  if(e.key==="ArrowLeft")left=true;
+  if(e.key==="ArrowRight")right=true;
 });
 
 document.addEventListener("keyup",e=>{
-  if(e.key==="ArrowLeft")moveLeft=false;
-  if(e.key==="ArrowRight")moveRight=false;
+  if(e.key==="ArrowLeft")left=false;
+  if(e.key==="ArrowRight")right=false;
 });
 </script>
 
 </body>
-</html>
+</html>.
