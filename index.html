@@ -3,39 +3,269 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🚗 Drive Survival</title>
+<title>🚗 Drive Survival Pro</title>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;font-family:Arial;background:#101014;color:white}
-#game{width:100vw;height:100vh;position:relative;background:linear-gradient(#1b1b28,#08080d)}
-.road{position:absolute;left:50%;top:0;transform:translateX(-50%);width:340px;height:100vh;background:#303038;overflow:hidden;border-left:6px solid #555;border-right:6px solid #555}
-.line{position:absolute;left:50%;width:10px;height:80px;background:white;border-radius:99px;transform:translateX(-50%);opacity:.85}
-#player{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);font-size:58px;z-index:5;filter:drop-shadow(0 12px 14px rgba(0,0,0,.45))}
-.enemy,.coin,.laser,.shieldItem{position:absolute;z-index:4}
-.enemy{font-size:54px}
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+  background:#07070d;
+  color:white;
+}
+
+#game{
+  width:100vw;
+  height:100vh;
+  position:relative;
+  background:
+    radial-gradient(circle at top,#2a2a55,#08080f 55%),
+    linear-gradient(#101018,#050508);
+}
+
+.road{
+  position:absolute;
+  left:50%;
+  top:0;
+  transform:translateX(-50%);
+  width:350px;
+  height:100vh;
+  background:linear-gradient(90deg,#25252d,#3b3b45,#25252d);
+  overflow:hidden;
+  border-left:6px solid #ff4d6d;
+  border-right:6px solid #00e5ff;
+  box-shadow:0 0 45px rgba(0,229,255,.18);
+}
+
+.line{
+  position:absolute;
+  left:50%;
+  width:10px;
+  height:85px;
+  background:white;
+  border-radius:99px;
+  transform:translateX(-50%);
+  opacity:.85;
+}
+
+#player{
+  position:absolute;
+  bottom:75px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:62px;
+  z-index:5;
+  filter:drop-shadow(0 0 18px rgba(0,229,255,.7));
+}
+
+.enemy,.coin,.laser,.shieldItem,.heartItem,.boostItem{
+  position:absolute;
+  z-index:4;
+}
+
+.enemy{font-size:56px}
 .coin{font-size:34px}
-.shieldItem{font-size:36px}
-.laser{width:7px;height:34px;background:#00e5ff;border-radius:999px;box-shadow:0 0 18px #00e5ff;z-index:6}
-#hud{position:fixed;top:12px;left:10px;right:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;z-index:20}
-.box{background:rgba(255,255,255,.13);backdrop-filter:blur(8px);padding:9px;border-radius:16px;font-weight:900;text-align:center;font-size:14px}
-.screen{position:fixed;inset:0;background:linear-gradient(#111,#2c2c3a);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:99;padding:20px}
+.shieldItem,.heartItem,.boostItem{font-size:38px}
+
+.laser{
+  width:8px;
+  height:38px;
+  background:#00e5ff;
+  border-radius:999px;
+  box-shadow:0 0 22px #00e5ff;
+  z-index:6;
+}
+
+#hud{
+  position:fixed;
+  top:12px;
+  left:10px;
+  right:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  z-index:20;
+}
+
+.box{
+  background:rgba(255,255,255,.13);
+  backdrop-filter:blur(10px);
+  padding:10px 8px;
+  border-radius:18px;
+  font-weight:900;
+  text-align:center;
+  font-size:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+
+.screen{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top,#ff4d6d33,#0000 45%),
+    linear-gradient(180deg,#151526,#07070d);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  z-index:99;
+  padding:24px;
+}
+
 #gameOver{display:none}
-.logo{font-size:100px;animation:float 2s infinite}
-@keyframes float{50%{transform:translateY(-12px)}}
-h1{font-size:42px;margin:8px}
-p{color:#ddd;max-width:340px}
-button{border:0;background:linear-gradient(135deg,#ff4d6d,#ff758f);color:white;padding:15px 24px;border-radius:999px;font-size:17px;font-weight:900;margin:6px;cursor:pointer;box-shadow:0 12px 25px rgba(255,77,109,.25)}
-.controls{position:fixed;bottom:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 24px;z-index:30;pointer-events:none}
-.ctrl{width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:30px;pointer-events:auto;box-shadow:0 12px 24px rgba(0,0,0,.35);user-select:none}
-#shoot{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);width:72px;height:72px;border-radius:50%;background:#111;display:flex;align-items:center;justify-content:center;font-size:32px;z-index:30;box-shadow:0 12px 24px rgba(0,0,0,.35)}
-#shop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:120;padding:20px;overflow:auto}
-.shopCard{background:white;color:#111;max-width:430px;margin:auto;border-radius:28px;padding:20px;text-align:center}
-.upgrade{display:flex;justify-content:space-between;align-items:center;background:#f3f3f3;border-radius:18px;padding:12px;margin:10px 0;text-align:right}
-.buy{background:#111;color:white;padding:10px 14px;font-size:14px}
-.pop{position:absolute;font-size:24px;z-index:40;animation:pop .6s forwards;pointer-events:none}
-@keyframes pop{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-35px) scale(1.4)}}
-.shieldGlow{filter:drop-shadow(0 0 18px #00e5ff)}
+
+.logo{
+  font-size:115px;
+  animation:float 2s infinite;
+  filter:drop-shadow(0 0 28px rgba(255,77,109,.6));
+}
+
+@keyframes float{
+  50%{transform:translateY(-13px)}
+}
+
+h1{
+  font-size:44px;
+  margin:8px;
+}
+
+p{
+  color:#ddd;
+  max-width:350px;
+  line-height:1.5;
+}
+
+button{
+  border:0;
+  background:linear-gradient(135deg,#ff4d6d,#ff758f);
+  color:white;
+  padding:15px 24px;
+  border-radius:999px;
+  font-size:17px;
+  font-weight:900;
+  margin:6px;
+  cursor:pointer;
+  box-shadow:0 12px 25px rgba(255,77,109,.28);
+}
+
+.secondary{
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.2);
+}
+
+.controls{
+  position:fixed;
+  bottom:18px;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:space-between;
+  padding:0 24px;
+  z-index:30;
+  pointer-events:none;
+}
+
+.ctrl{
+  width:68px;
+  height:68px;
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  pointer-events:auto;
+  box-shadow:0 12px 24px rgba(0,0,0,.35);
+  user-select:none;
+}
+
+#shoot{
+  position:fixed;
+  bottom:98px;
+  left:50%;
+  transform:translateX(-50%);
+  width:76px;
+  height:76px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#111,#333);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:34px;
+  z-index:30;
+  box-shadow:0 0 28px rgba(0,229,255,.35);
+}
+
+#shop{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(12px);
+  z-index:120;
+  padding:18px;
+  overflow:auto;
+}
+
+.shopCard{
+  background:linear-gradient(180deg,#fff,#f4f4f4);
+  color:#111;
+  max-width:440px;
+  margin:auto;
+  border-radius:30px;
+  padding:20px;
+  text-align:center;
+}
+
+.upgrade{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:white;
+  border-radius:20px;
+  padding:13px;
+  margin:10px 0;
+  text-align:right;
+  box-shadow:0 8px 18px rgba(0,0,0,.08);
+}
+
+.buy{
+  background:#111;
+  color:white;
+  padding:10px 14px;
+  font-size:14px;
+  min-width:70px;
+}
+
+.pop{
+  position:absolute;
+  font-size:24px;
+  z-index:40;
+  animation:pop .6s forwards;
+  pointer-events:none;
+}
+
+@keyframes pop{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(-38px) scale(1.45)}
+}
+
+.shieldGlow{
+  filter:drop-shadow(0 0 24px #00e5ff);
+}
+
+.star{
+  position:absolute;
+  color:white;
+  opacity:.55;
+  animation:twinkle 2s infinite;
+}
+
+@keyframes twinkle{
+  50%{opacity:1;transform:scale(1.2)}
+}
 </style>
 </head>
 
@@ -63,9 +293,9 @@ button{border:0;background:linear-gradient(135deg,#ff4d6d,#ff758f);color:white;p
 <div id="start" class="screen">
   <div class="logo">🏎️</div>
   <h1>Drive Survival</h1>
-  <p>אסוף מטבעות, התחמק ממכוניות, קנה שדרוגים ותירה באויבים.</p>
+  <p>אסוף מטבעות, התחמק מאויבים, קנה שדרוגים ותשרוד כמה שיותר.</p>
   <button onclick="startGame()">התחל משחק</button>
-  <button onclick="openShop()">🛒 חנות</button>
+  <button class="secondary" onclick="openShop()">🛒 חנות</button>
 </div>
 
 <div id="gameOver" class="screen">
@@ -73,12 +303,12 @@ button{border:0;background:linear-gradient(135deg,#ff4d6d,#ff758f);color:white;p
   <h1>נפגעת!</h1>
   <p>הניקוד שלך: <b id="finalScore">0</b></p>
   <button onclick="restartGame()">שחק שוב</button>
-  <button onclick="openShop()">🛒 חנות שדרוגים</button>
+  <button class="secondary" onclick="openShop()">🛒 חנות שדרוגים</button>
 </div>
 
 <div id="shop">
   <div class="shopCard">
-    <h1>🛒 חנות</h1>
+    <h1>🛒 חנות שדרוגים</h1>
     <p>יש לך <b id="shopCoins">0</b> מטבעות</p>
 
     <div class="upgrade">
@@ -101,6 +331,21 @@ button{border:0;background:linear-gradient(135deg,#ff4d6d,#ff758f);color:white;p
       <button class="buy" onclick="buyUpgrade('shield',120)">קנה</button>
     </div>
 
+    <div class="upgrade">
+      <div>🧲 מגנט מטבעות<br><small>מחיר: 150</small></div>
+      <button class="buy" onclick="buyUpgrade('magnet',150)">קנה</button>
+    </div>
+
+    <div class="upgrade">
+      <div>💎 דאבל מטבעות<br><small>מחיר: 220</small></div>
+      <button class="buy" onclick="buyUpgrade('doubleCoins',220)">קנה</button>
+    </div>
+
+    <div class="upgrade">
+      <div>🚀 טורבו<br><small>מחיר: 260</small></div>
+      <button class="buy" onclick="buyUpgrade('turbo',260)">קנה</button>
+    </div>
+
     <button onclick="closeShop()">סגור</button>
   </div>
 </div>
@@ -115,22 +360,36 @@ let lives=3;
 let carX=window.innerWidth/2;
 let left=false,right=false;
 let running=false;
-let speed=3.2;
-let playerSpeed=5.2;
-let enemyTimer,coinTimer,shieldTimer;
+let speed=4.2;
+let playerSpeed=6.2;
+
+let enemyTimer,coinTimer,shieldTimer,heartTimer,boostTimer;
 
 let upgrades=JSON.parse(localStorage.getItem("driveUpgrades"))||{
   speed:0,
   life:0,
   laser:false,
-  shield:false
+  shield:false,
+  magnet:false,
+  doubleCoins:false,
+  turbo:false
 };
 
 for(let i=0;i<8;i++){
   const line=document.createElement("div");
   line.className="line";
-  line.style.top=(i*140)+"px";
+  line.style.top=(i*135)+"px";
   road.appendChild(line);
+}
+
+for(let i=0;i<28;i++){
+  const s=document.createElement("div");
+  s.className="star";
+  s.innerText="✦";
+  s.style.left=Math.random()*100+"vw";
+  s.style.top=Math.random()*100+"vh";
+  s.style.animationDelay=Math.random()*2+"s";
+  document.getElementById("game").appendChild(s);
 }
 
 function updateUI(){
@@ -143,13 +402,15 @@ function updateUI(){
 updateUI();
 
 function resetGame(){
-  document.querySelectorAll(".enemy,.coin,.laser,.shieldItem,.pop").forEach(e=>e.remove());
+  document.querySelectorAll(".enemy,.coin,.laser,.shieldItem,.heartItem,.boostItem,.pop").forEach(e=>e.remove());
+
   score=0;
   lives=3+upgrades.life;
-  speed=3.2;
-  playerSpeed=5.2+(upgrades.speed*0.9);
+  speed=4.2;
+  playerSpeed=6.2+(upgrades.speed*1.1)+(upgrades.turbo?1.5:0);
   carX=window.innerWidth/2;
-  player.classList.toggle("shieldGlow", upgrades.shield);
+
+  player.classList.toggle("shieldGlow",upgrades.shield);
   updateUI();
 }
 
@@ -157,9 +418,13 @@ function startGame(){
   document.getElementById("start").style.display="none";
   resetGame();
   running=true;
-  enemyTimer=setInterval(createEnemy,1050);
-  coinTimer=setInterval(createCoin,850);
-  shieldTimer=setInterval(createShield,9000);
+
+  enemyTimer=setInterval(createEnemy,850);
+  coinTimer=setInterval(createCoin,650);
+  shieldTimer=setInterval(createShield,8500);
+  heartTimer=setInterval(createHeart,12000);
+  boostTimer=setInterval(createBoost,10000);
+
   requestAnimationFrame(loop);
 }
 
@@ -167,25 +432,29 @@ function restartGame(){
   document.getElementById("gameOver").style.display="none";
   resetGame();
   running=true;
-  enemyTimer=setInterval(createEnemy,1050);
-  coinTimer=setInterval(createCoin,850);
-  shieldTimer=setInterval(createShield,9000);
+
+  enemyTimer=setInterval(createEnemy,850);
+  coinTimer=setInterval(createCoin,650);
+  shieldTimer=setInterval(createShield,8500);
+  heartTimer=setInterval(createHeart,12000);
+  boostTimer=setInterval(createBoost,10000);
+
   requestAnimationFrame(loop);
 }
 
 function roadBounds(){
-  const roadLeft=(window.innerWidth-340)/2;
-  return {left:roadLeft+35,right:roadLeft+305};
+  const roadLeft=(window.innerWidth-350)/2;
+  return {left:roadLeft+38,right:roadLeft+312};
 }
 
 function createEnemy(){
   if(!running)return;
   const e=document.createElement("div");
   e.className="enemy";
-  e.innerText=["🚙","🚕","🚓","🚚"][Math.floor(Math.random()*4)];
+  e.innerText=["🚙","🚕","🚓","🚚","👾"][Math.floor(Math.random()*5)];
   const b=roadBounds();
-  e.style.left=(b.left+Math.random()*(b.right-b.left-40))+"px";
-  e.style.top="-70px";
+  e.style.left=(b.left+Math.random()*(b.right-b.left-42))+"px";
+  e.style.top="-75px";
   document.getElementById("game").appendChild(e);
 }
 
@@ -202,14 +471,28 @@ function createCoin(){
 }
 
 function createShield(){
-  if(!running || Math.random()>0.4)return;
-  const s=document.createElement("div");
-  s.className="shieldItem";
-  s.innerText="🛡️";
+  if(!running || Math.random()>0.45)return;
+  createPower("shieldItem","🛡️");
+}
+
+function createHeart(){
+  if(!running || Math.random()>0.45)return;
+  createPower("heartItem","❤️");
+}
+
+function createBoost(){
+  if(!running || Math.random()>0.5)return;
+  createPower("boostItem","⚡");
+}
+
+function createPower(cls,emoji){
+  const item=document.createElement("div");
+  item.className=cls;
+  item.innerText=emoji;
   const b=roadBounds();
-  s.style.left=(b.left+Math.random()*(b.right-b.left-35))+"px";
-  s.style.top="-50px";
-  document.getElementById("game").appendChild(s);
+  item.style.left=(b.left+Math.random()*(b.right-b.left-35))+"px";
+  item.style.top="-55px";
+  document.getElementById("game").appendChild(item);
 }
 
 function shootLaser(){
@@ -217,7 +500,7 @@ function shootLaser(){
   const l=document.createElement("div");
   l.className="laser";
   l.style.left=carX+"px";
-  l.style.top=(window.innerHeight-145)+"px";
+  l.style.top=(window.innerHeight-150)+"px";
   document.getElementById("game").appendChild(l);
 }
 
@@ -256,7 +539,7 @@ function loop(){
   moveCoins();
   moveEnemies();
   moveLasers();
-  moveShields();
+  movePowers();
 
   requestAnimationFrame(loop);
 }
@@ -264,42 +547,67 @@ function loop(){
 function moveCoins(){
   document.querySelectorAll(".coin").forEach(c=>{
     let y=c.offsetTop+speed;
+
+    if(upgrades.magnet){
+      const dx=carX-c.offsetLeft;
+      if(Math.abs(dx)<95)c.style.left=(c.offsetLeft+dx*0.08)+"px";
+    }
+
     c.style.top=y+"px";
 
     if(hit(c.getBoundingClientRect(),player.getBoundingClientRect())){
-      const val=Number(c.dataset.value);
+      let val=Number(c.dataset.value);
+      if(upgrades.doubleCoins)val*=2;
+
       pop(c.offsetLeft,c.offsetTop,"+"+val+" 🪙");
       coins+=val;
       score+=val;
       localStorage.setItem("driveCoins",coins);
       c.remove();
       updateUI();
-      if(score%20===0)speed+=0.25;
+
+      if(score%20===0)speed+=0.35;
     }
 
     if(y>window.innerHeight)c.remove();
   });
 }
 
-function moveShields(){
-  document.querySelectorAll(".shieldItem").forEach(s=>{
-    let y=s.offsetTop+speed;
-    s.style.top=y+"px";
+function movePowers(){
+  document.querySelectorAll(".shieldItem,.heartItem,.boostItem").forEach(item=>{
+    let y=item.offsetTop+speed;
+    item.style.top=y+"px";
 
-    if(hit(s.getBoundingClientRect(),player.getBoundingClientRect())){
-      upgrades.shield=true;
-      player.classList.add("shieldGlow");
-      s.remove();
-      pop(player.offsetLeft,player.offsetTop,"מגן 🛡️");
+    if(hit(item.getBoundingClientRect(),player.getBoundingClientRect())){
+      if(item.classList.contains("shieldItem")){
+        upgrades.shield=true;
+        player.classList.add("shieldGlow");
+        pop(player.offsetLeft,player.offsetTop,"מגן 🛡️");
+      }
+
+      if(item.classList.contains("heartItem")){
+        lives++;
+        pop(player.offsetLeft,player.offsetTop,"+1 ❤️");
+      }
+
+      if(item.classList.contains("boostItem")){
+        score+=5;
+        coins+=5;
+        pop(player.offsetLeft,player.offsetTop,"בוסט +5 ⚡");
+        localStorage.setItem("driveCoins",coins);
+      }
+
+      item.remove();
+      updateUI();
     }
 
-    if(y>window.innerHeight)s.remove();
+    if(y>window.innerHeight)item.remove();
   });
 }
 
 function moveEnemies(){
   document.querySelectorAll(".enemy").forEach(e=>{
-    let y=e.offsetTop+(speed+0.4);
+    let y=e.offsetTop+(speed+0.7);
     e.style.top=y+"px";
 
     if(hit(e.getBoundingClientRect(),player.getBoundingClientRect())){
@@ -320,14 +628,14 @@ function moveEnemies(){
       e.remove();
       score++;
       updateUI();
-      if(score%15===0)speed+=0.35;
+      if(score%15===0)speed+=0.4;
     }
   });
 }
 
 function moveLasers(){
   document.querySelectorAll(".laser").forEach(l=>{
-    let y=l.offsetTop-10;
+    let y=l.offsetTop-12;
     l.style.top=y+"px";
 
     document.querySelectorAll(".enemy").forEach(e=>{
@@ -351,6 +659,9 @@ function endGame(){
   clearInterval(enemyTimer);
   clearInterval(coinTimer);
   clearInterval(shieldTimer);
+  clearInterval(heartTimer);
+  clearInterval(boostTimer);
+
   document.getElementById("finalScore").innerText=score;
   document.getElementById("gameOver").style.display="flex";
 }
@@ -376,11 +687,15 @@ function buyUpgrade(type,price){
   if(type==="life")upgrades.life++;
   if(type==="laser")upgrades.laser=true;
   if(type==="shield")upgrades.shield=true;
+  if(type==="magnet")upgrades.magnet=true;
+  if(type==="doubleCoins")upgrades.doubleCoins=true;
+  if(type==="turbo")upgrades.turbo=true;
 
   localStorage.setItem("driveCoins",coins);
   localStorage.setItem("driveUpgrades",JSON.stringify(upgrades));
+
   updateUI();
-  alert("נקנה!");
+  alert("שדרוג נקנה 😈");
 }
 
 document.addEventListener("keydown",e=>{
